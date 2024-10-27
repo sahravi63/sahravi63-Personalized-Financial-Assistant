@@ -1,0 +1,83 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+/* Input fields focus styles */
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border: 2px solid black; /* Highlight border on focus */
+}
+
+/* Box shadow for totals section */
+.totals {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow without overriding */
+}
+
+/* Button transition for hover effect */
+button {
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Added transition for scale effect */
+}
+
+/* Button hover effect */
+button:hover {
+  transform: scale(1.02); /* Slightly scale up on hover for better interaction */
+}
+
+/* Expense links spacing */
+.expense-links {
+  gap: 10px; /* Add gap for better spacing between links */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .totals {
+    flex-direction: column; /* Stack totals vertically on small screens */
+    align-items: center; /* Center align on small screens */
+  }
+  
+  button[type="submit"],
+  button[type="button"] {
+    width: 100%; /* Ensure buttons take full width on small screens */
+  }
+}
+
+/* Styles for income and expense boxes */
+.income-box,
+.expense-box {
+  display: flex; /* Flexbox for better alignment */
+  flex-direction: column; /* Stack elements vertically */
+  align-items: flex-start; /* Align content to the start */
+  padding: 20px;
+  margin: 20px auto; /* Center the boxes horizontally with auto margins */
+  border-radius: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 600px; 
+  background-color: #ffe0e0;
+}
+
+.income-box {
+  background-color: #e0ffe0; /* Light green for income */
+  border: 1px solid #4CAF50; /* Green border */
+}
+
+.expense-box {
+  background-color: #ffe0e0; /* Light red for expenses */
+  border: 1px solid #f44336; /* Red border */
+}
+
+.income-box h2,
+.expense-box h2 {
+  margin: 0 0 10px; /* Space below headings */
+  color: #ac0a0a;
+  
+}
+
+/* Other existing styles remain unchanged... */

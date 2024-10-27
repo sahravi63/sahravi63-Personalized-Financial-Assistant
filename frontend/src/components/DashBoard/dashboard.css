@@ -1,0 +1,114 @@
+/* General Resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Ensures consistent sizing across elements */
+  }
+  
+  html, body {
+    font-family: 'Roboto', sans-serif; /* Use a modern, web-safe font */
+    font-size: 16px; /* Base font size for scalability */
+    line-height: 1.6; /* Optimal line height for readability */
+    background-color: #f0f2f5; /* Neutral background to highlight content */
+    color: #333; /* Dark gray text color for contrast */
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  
+  }
+  
+  /* Container for the entire dashboard */
+  .dashboard-container {
+    display: flex;
+    justify-content: space-between; /* Space between components */
+    align-items: flex-start; /* Align items at the top */
+    flex-wrap: wrap; /* Allow wrapping for responsiveness */
+    padding: 20px;
+    gap: 30px; /* Consistent gap between child elements */
+    max-width: 1200px; /* Limit the width for large screens */
+    margin: 40px auto; /* Center container and add space around it */
+    background-color: #fff; /* White background for content clarity */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  
+  /* Reusable Card Container (applies to both gauge and graph) */
+  .card {
+    flex: 1; /* Allow flexible width based on available space */
+    min-width: 320px; /* Minimum width to ensure readability on small screens */
+    max-width: 500px; /* Prevent containers from getting too large */
+    background-color: #ffffff; /* White background for contrast */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Light shadow for subtle depth */
+    padding: 20px;
+    margin-bottom: 20px; /* Space between stacked elements on small screens */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+  }
+  
+  .card:hover {
+    transform: translateY(-5px); /* Slight upward shift on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+  }
+  
+  h2 {
+    font-size: 1.6rem; /* Slightly larger font size for headers */
+    margin-bottom: 20px;
+    font-weight: 500;
+    color: #444; /* Softer black for text */
+    text-align: center; /* Center align headers */
+  }
+  
+  /* Styling for the Gauge Chart */
+  .gauge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 320px; /* Fixed height for consistency */
+    padding: 15px; /* Padding inside the gauge container */
+  }
+  
+  #gauge-chart {
+    width: 100%; /* Ensure gauge takes full width */
+    max-height: 250px; /* Fixed height for responsive behavior */
+  }
+  
+  /* Styling for the Bar Chart */
+  .graph-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px; /* Fixed height for the bar chart */
+  }
+  
+  .graph-container canvas {
+    max-width: 100%; /* Ensure responsiveness of the canvas */
+  }
+  
+  /* Responsive Styling */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      flex-direction: column; /* Stack items vertically */
+      align-items: center; /* Center align them */
+      padding: 15px; /* Reduce padding on small screens */
+    }
+  
+    .card {
+      width: 100%; /* Full width for stacked layout */
+      max-width: none; /* Remove max-width for small screens */
+      margin-bottom: 25px; /* Extra margin for separation */
+    }
+  
+    h2 {
+      font-size: 1.4rem; /* Adjust heading size on small screens */
+    }
+  
+    .gauge-container {
+      height: 280px; /* Smaller height for compact layout */
+    }
+  
+    .graph-container {
+      height: 350px; /* Adjust chart height for smaller screens */
+    }
+  }
+  

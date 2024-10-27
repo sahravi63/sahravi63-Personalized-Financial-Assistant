@@ -1,0 +1,178 @@
+/* Profile Form Styles */
+.profile-form {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+  }
+  
+  .profile-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .profile-content {
+    display: flex;
+    gap: 30px; /* Increased gap for better spacing */
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .profile-picture-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px; /* Increased margin for better spacing */
+    border: 2px solid #007BFF;
+  }
+  
+  .file-input {
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px; /* Increased padding for better appearance */
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .file-input:hover {
+    background-color: #0056b3;
+  }
+  
+  .profile-details-section {
+    flex-grow: 1;
+  }
+  
+  .profile-label {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .profile-input {
+    width: 100%;
+    padding: 12px; /* Increased padding for better appearance */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px; /* Increased margin for better spacing */
+  }
+  
+  .profile-button {
+    padding: 12px 24px; /* Increased padding for better appearance */
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .save-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #218838;
+  }
+  
+  .logout-button {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .logout-button:hover {
+    background-color: #c82333;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .profile-content {
+      flex-direction: column;
+      gap: 25px; /* Increased gap for better spacing */
+    }
+  
+    .profile-buttons {
+      flex-direction: column;
+      gap: 15px; /* Increased gap for better spacing */
+    }
+  }
+  
+  /* Updated Button Styles */
+  .appButton {
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background-color: #ff5252; /* New background color */
+    border: 2px solid black; /* Black border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 5px 5px 0px black; /* New shadow effect */
+    transition: all 0.3s ease; /* Smooth transition */
+    padding: 12px 24px; /* Increased padding for better appearance */
+    width: 150px;
+    cursor: pointer;
+    margin-bottom: 20px; /* Added margin to ensure spacing between buttons */
+  }
+  
+  .appButton:hover {
+    background-color: #fff; /* White background on hover */
+    color: red; /* Red text on hover */
+    border: 2px solid red; /* Red border on hover */
+    box-shadow: 5px 5px 0px red; /* Red shadow on hover */
+  }
+  
+  .appButton:active {
+    background-color: rgb(168, 187, 43); /* Greenish background on click */
+    box-shadow: none; /* Remove shadow on click */
+    transform: translateY(4px); /* Button moves down on click */
+  }
+  
+  /* Comic Button Styles */
+  .comic-button {
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background-color: #ff5252;
+    border: 2px solid black;
+    border-radius: 10px;
+    box-shadow: 5px 5px 0px black;
+    transition: all 0.3s ease;
+    padding: 12px 24px; /* Increased padding for better appearance */
+    margin-bottom: 20px; /* Added margin to ensure spacing between buttons */
+  }
+  
+  .comic-button:hover {
+    background-color: #fff;
+    color: red;
+    border: 2px solid red;
+    box-shadow: 5px 5px 0px red;
+  }
+  
+  .comic-button:active {
+    background-color: rgb(168, 187, 43);
+    box-shadow: none;
+    transform: translateY(4px);
+  }
+  
