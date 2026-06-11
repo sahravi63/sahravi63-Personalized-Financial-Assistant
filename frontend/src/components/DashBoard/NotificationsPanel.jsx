@@ -1,11 +1,5 @@
-import React from 'react';
-
-const NOTIFICATIONS = [
-  { id: 1, name: 'Michael Dew', msg: 'Your transfer of $120 is complete.', time: '8 mins ago', status: 'Completed', avatar: 'MD' },
-  { id: 2, name: 'Jessica Wallet', msg: 'Payment for $580 was transferred.', time: '16 mins ago', status: 'Transferred', avatar: 'JW' },
-  { id: 3, name: 'Amanda Shaw', msg: 'Payment request for $95 is pending.', time: '20 mins ago', status: 'Pending', avatar: 'AS' },
-  { id: 4, name: 'Aditi Tak', msg: 'Request for $180 received.', time: '1 hr ago', status: 'Pending', avatar: 'AT' },
-];
+import React, { useEffect, useState } from 'react';
+import api from '../../api';
 
 const statusColors = {
   Completed: { background: 'rgba(74, 222, 128, 0.16)', color: '#4ade80' },
@@ -13,7 +7,23 @@ const statusColors = {
   Pending: { background: 'rgba(251, 191, 36, 0.16)', color: '#fbbf24' },
 };
 
-const NotificationsPanel = ({ onClose }) => (
+const NotificationsPanel = ({ onClose }) => {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const { data } = await api.get('/api/dashboard/notifications');
+        setNotifications(data);
+      } catch (error) {
+        console.error('Failed to fetch notifications', error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  return (
   <>
     <button
       type="button"
@@ -29,16 +39,16 @@ const NotificationsPanel = ({ onClose }) => (
         </button>
       </div>
       <div className="notif-list">
-        {NOTIFICATIONS.map((notification) => {
+        {notifications.map((notification) => {
           const statusStyle = statusColors[notification.status] || statusColors.Pending;
           return (
-            <article key={notification.id} className="notif-item">
+            <article key={notification._id || notification.id} className="notif-item">
               <div className="notif-avatar">{notification.avatar}</div>
               <div className="notif-body">
-                <p className="notif-name">{notification.name}</p>
-                <p className="notif-msg">{notification.msg}</p>
+                <p className="notif-name">{notification.title}</p>
+                <p className="notif-msg">{notification.message}</p>
                 <div className="notif-footer">
-                  <span className="notif-time">{notification.time}</span>
+                  <span className="notif-time">{notification.timeLabel}</span>
                   <span className="notif-status" style={statusStyle}>
                     {notification.status}
                   </span>
@@ -51,6 +61,7 @@ const NotificationsPanel = ({ onClose }) => (
       <button type="button" className="notif-view-all">View all notifications</button>
     </section>
   </>
-);
+  );
+};
 
 export default NotificationsPanel;

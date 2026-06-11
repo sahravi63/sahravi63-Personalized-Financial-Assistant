@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../../api';
 
 const CONTACTS = [
   { name: 'Dwight', initials: 'DW' },
@@ -14,15 +15,26 @@ const QuickTransfer = () => {
   const [note, setNote] = useState('');
   const [sent, setSent] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!selected || !amount) return;
-    setSent(true);
-    window.setTimeout(() => {
-      setSent(false);
-      setAmount('');
-      setNote('');
-      setSelected('');
-    }, 1800);
+    try {
+      await api.post('/api/dashboard/notifications', {
+        title: `Transfer to ${selected}`,
+        message: `A transfer of $${Number(amount).toFixed(2)} was recorded${note ? ` (${note})` : ''}.`,
+        status: 'Transferred',
+        timeLabel: 'Just now',
+        avatar: selected.slice(0, 2).toUpperCase(),
+      });
+      setSent(true);
+      window.setTimeout(() => {
+        setSent(false);
+        setAmount('');
+        setNote('');
+        setSelected('');
+      }, 1800);
+    } catch (error) {
+      console.error('Failed to record transfer', error);
+    }
   };
 
   return (

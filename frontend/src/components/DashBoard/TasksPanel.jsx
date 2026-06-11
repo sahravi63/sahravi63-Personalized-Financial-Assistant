@@ -1,28 +1,44 @@
-import React, { useState } from 'react';
-
-const INITIAL_TASKS = [
-  { id: 1, text: 'Review Q2 budget report', done: true },
-  { id: 2, text: 'Set up auto-pay for utilities', done: true },
-  { id: 3, text: 'Transfer $500 to savings', done: false },
-  { id: 4, text: 'Compare insurance quotes', done: false },
-  { id: 5, text: 'Update emergency fund goal', done: false },
-];
+import React, { useEffect, useState } from 'react';
+import api from '../../api';
 
 const TasksPanel = () => {
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
+  const [tasks, setTasks] = useState([]);
   const [newText, setNewText] = useState('');
 
-  const toggle = (id) => {
-    setTasks((items) => items.map((item) => (
-      item.id === id ? { ...item, done: !item.done } : item
-    )));
+  const fetchTasks = async () => {
+    try {
+      const { data } = await api.get('/api/dashboard/tasks');
+      setTasks(data);
+    } catch (error) {
+      console.error('Failed to fetch tasks', error);
+    }
   };
 
-  const add = () => {
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const toggle = async (id) => {
+    const task = tasks.find((item) => item._id === id);
+    if (!task) return;
+    try {
+      await api.put(`/api/dashboard/tasks/${id}`, { done: !task.done });
+      await fetchTasks();
+    } catch (error) {
+      console.error('Failed to update task', error);
+    }
+  };
+
+  const add = async () => {
     const text = newText.trim();
     if (!text) return;
-    setTasks((items) => [...items, { id: Date.now(), text, done: false }]);
-    setNewText('');
+    try {
+      await api.post('/api/dashboard/tasks', { text });
+      setNewText('');
+      await fetchTasks();
+    } catch (error) {
+      console.error('Failed to add task', error);
+    }
   };
 
   const done = tasks.filter((task) => task.done).length;
@@ -42,11 +58,11 @@ const TasksPanel = () => {
 
       <div className="tasks-list">
         {tasks.map((task) => (
-          <label key={task.id} className="task-item">
+          <label key={task._id} className="task-item">
             <input
               type="checkbox"
-              checked={task.done}
-              onChange={() => toggle(task.id)}
+              checked={Boolean(task.done)}
+              onChange={() => toggle(task._id)}
               className="task-checkbox"
             />
             <span className={`task-text ${task.done ? 'task-text--done' : ''}`}>{task.text}</span>

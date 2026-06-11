@@ -30,7 +30,11 @@ const Dashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [period, setPeriod] = useState('Last 6 months');
 
-  const monthsMap = { 'Last 3 months': 3, 'Last 6 months': 6, 'Last 12 months': 12 };
+  const monthsMap = useMemo(() => ({
+    'Last 3 months': 3,
+    'Last 6 months': 6,
+    'Last 12 months': 12,
+  }), []);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -43,7 +47,7 @@ const Dashboard = () => {
     };
 
     fetchSummary();
-  }, [period]);
+  }, [monthsMap, period]);
 
   useEffect(() => {
     const fetchTransactions = async () => {

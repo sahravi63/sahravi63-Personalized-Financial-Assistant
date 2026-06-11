@@ -24,6 +24,7 @@ const expenseRoutes = require('./routes/expenseRoutes');
 const incomeRoutes = require('./routes/incomeRoutes');
 const summaryRoutes = require('./routes/summaryRoutes');
 const insightsRoutes = require('./routes/insightsRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 
@@ -49,6 +50,7 @@ app.use('/api', expenseRoutes);
 app.use('/api', incomeRoutes);
 app.use('/api', summaryRoutes);
 app.use('/api', insightsRoutes);
+app.use('/api', dashboardRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api', userRoutes);
 
