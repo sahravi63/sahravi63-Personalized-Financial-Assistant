@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../db/User');
-const bcrypt = require('bcrypt'); // Ensure bcrypt is imported for password hashing
+const bcrypt = require('bcrypt');
+const adminAuthenticate = require('../adminAuthenticate');
 
 // Add a new user
-router.post('/add-user', async (req, res) => {
+router.post('/add-user', adminAuthenticate, async (req, res) => {
   try {
-    const {  email, password } = req.body;
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Username, email, and password are required' });
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword });
     await user.save();
@@ -17,7 +21,7 @@ router.post('/add-user', async (req, res) => {
 });
 
 // Remove a user
-router.delete('/remove-user/:userId', async (req, res) => {
+router.delete('/remove-user/:userId', adminAuthenticate, async (req, res) => {
   try {
     const { userId } = req.params;
     await User.findByIdAndDelete(userId);

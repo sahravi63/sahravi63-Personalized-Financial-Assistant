@@ -68,6 +68,12 @@ const ProfileComponent = ({ user: propUser, onLogout }) => {
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
     if (!selected) return;
+
+    if (selected.size > 5 * 1024 * 1024) {
+      setMessage({ text: 'Please choose an image smaller than 5 MB.', type: 'error' });
+      e.target.value = '';
+      return;
+    }
     // Revoke previous object URL to free memory
     if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
     setFile(selected);

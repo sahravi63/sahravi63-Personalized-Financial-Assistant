@@ -1,8 +1,7 @@
-const path = require('path');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
@@ -29,6 +28,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 // Middleware
+app.use(helmet());
 app.use(
   cors({
     origin: allowedOrigins,
@@ -38,7 +38,8 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('uploads'));
 
 // Routes
@@ -51,30 +52,25 @@ app.use('/api', insightsRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api', userRoutes);
 
-// Get all users
-app.get('/users', async (req, res) => {
-  try {
-    const users = await User.find({}, 'username email');
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Failed to fetch users:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
-});
-
 // Database initialization
 async function initializeDatabase() {
   try {
     console.log('Initializing database...');
 
-    const adminEmail = 'admin@example.com';
+    const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@example.com';
+    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
 
     const existingAdmin = await User.findOne({
       email: adminEmail,
     });
 
     if (!existingAdmin) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
+      if (!adminPassword) {
+        console.warn('DEFAULT_ADMIN_PASSWORD is not set; skipping automatic admin creation.');
+        return;
+      }
+
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
       await User.create({
         username: 'admin',
@@ -110,9 +106,7 @@ app.use((err, req, res, next) => {
 // Start application
 async function startServer() {
   try {
-    const mongoUri =
-      process.env.MONGODB_URI ||
-      'mongodb://localhost:27017/informations';
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/expenseProject';
 
     await mongoose.connect(mongoUri);
 

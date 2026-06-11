@@ -5,8 +5,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
+
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false });
 
 const validate = (req, res, next) => {
   const errors = validationResult(req);
@@ -23,7 +26,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // POST /api/register
-router.post('/register',
+router.post('/register', authLimiter,
   body('username').trim().notEmpty().withMessage('Username is required'),
   body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
@@ -39,13 +42,14 @@ router.post('/register',
       await newUser.save();
       res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error('Register error:', error);
+      res.status(500).json({ error: 'Registration failed' });
     }
   }
 );
 
 // POST /api/login
-router.post('/login',
+router.post('/login', authLimiter,
   body('email').isEmail().normalizeEmail(),
   body('password').notEmpty(),
   validate,
@@ -70,13 +74,14 @@ router.post('/login',
         user: { id: user._id, username: user.username, email: user.email, role: user.role },
       });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({ error: 'Login failed' });
     }
   }
 );
 
 // POST /api/reset-password-request
-router.post('/reset-password-request',
+router.post('/reset-password-request', authLimiter,
   body('email').isEmail().normalizeEmail(),
   validate,
   async (req, res) => {
@@ -102,7 +107,8 @@ router.post('/reset-password-request',
 
       res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error('Reset request error:', err);
+      res.status(500).json({ error: 'Failed to process reset request' });
     }
   }
 );
@@ -128,7 +134,8 @@ router.post('/reset-password',
 
       res.status(200).json({ message: 'Password reset successfully' });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error('Reset password error:', err);
+      res.status(500).json({ error: 'Failed to reset password' });
     }
   }
 );

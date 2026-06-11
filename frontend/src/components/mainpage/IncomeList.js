@@ -18,10 +18,18 @@ const IncomeList = ({ incomes = [], onUpdateIncome, onDeleteIncome }) => {
   };
 
   const handleUpdate = () => {
-    onUpdateIncome(editingId, {
-      description: editDescription.trim(),
-      amount: Number(editAmount),
-    });
+    const description = editDescription.trim();
+    const amount = Number(editAmount);
+
+    if (!description) {
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return;
+    }
+
+    onUpdateIncome(editingId, { description, amount });
     cancelEditing();
   };
 

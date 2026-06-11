@@ -20,25 +20,22 @@ const formatMoney = (value = 0, options = {}) => {
   });
 };
 
-const MOCK_TRANSACTIONS = [
-  { name: 'Salary', amount: 5000, type: 'Transfer', date: '06/01/26', status: 'Success' },
-  { name: 'Rent', amount: -1200, type: 'Transfer', date: '06/01/26', status: 'Success' },
-  { name: 'Amazon', amount: -120, type: 'Visa', date: '06/02/26', status: 'Success' },
-  { name: 'Netflix', amount: -15.99, type: 'MasterCard', date: '06/04/26', status: 'In progress' },
-];
 
 const Dashboard = () => {
   const [summary, setSummary] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [insights, setInsights] = useState('');
   const [loadingInsights, setLoadingInsights] = useState(false);
   const [error, setError] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [period, setPeriod] = useState('Last 6 months');
 
+  const monthsMap = { 'Last 3 months': 3, 'Last 6 months': 6, 'Last 12 months': 12 };
+
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const { data } = await api.get('/api/summary');
+        const { data } = await api.get(`/api/summary?months=${monthsMap[period] || 6}`);
         setSummary(data);
       } catch (err) {
         setError('Failed to load dashboard data');
@@ -46,6 +43,30 @@ const Dashboard = () => {
     };
 
     fetchSummary();
+  }, [period]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const [expensesRes, incomesRes] = await Promise.all([
+          api.get('/api/expenses'),
+          api.get('/api/income'),
+        ]);
+
+        const combined = [
+          ...expensesRes.data.map((item) => ({ ...item, amount: -Math.abs(Number(item.amount) || 0), type: 'Expense' })),
+          ...incomesRes.data.map((item) => ({ ...item, amount: Math.abs(Number(item.amount) || 0), type: 'Income' })),
+        ]
+          .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+          .slice(0, 8);
+
+        setTransactions(combined);
+      } catch (err) {
+        setTransactions([]);
+      }
+    };
+
+    fetchTransactions();
   }, []);
 
   const fetchInsights = async () => {
@@ -63,12 +84,25 @@ const Dashboard = () => {
 
   const stats = useMemo(() => {
     if (!summary) return [];
+
+    const currentIncome = summary.incomeTotals?.slice(-1)[0] || 0;
+    const previousIncome = summary.incomeTotals?.slice(-2, -1)[0] || 0;
+    const currentExpense = summary.expenseTotals?.slice(-1)[0] || 0;
+    const previousExpense = summary.expenseTotals?.slice(-2, -1)[0] || 0;
+    const currentSavings = currentIncome - currentExpense;
+    const previousSavings = previousIncome - previousExpense;
+
+    const pctChange = (current, previous) => {
+      if (previous === 0) return current === 0 ? '0%' : current > 0 ? '+100%' : '-100%';
+      return `${current >= previous ? '+' : ''}${(((current - previous) / previous) * 100).toFixed(0)}%`;
+    };
+
     const savings = summary.totalIncome - summary.totalExpenses;
 
     return [
-      { label: 'Income', value: summary.totalIncome, change: '+8%', tone: 'up' },
-      { label: 'Expense', value: summary.totalExpenses, change: '-6%', tone: 'down' },
-      { label: 'Savings', value: savings, change: '+8%', tone: savings >= 0 ? 'up' : 'down' },
+      { label: 'Income', value: summary.totalIncome, change: pctChange(currentIncome, previousIncome), tone: currentIncome >= previousIncome ? 'up' : 'down' },
+      { label: 'Expense', value: summary.totalExpenses, change: pctChange(currentExpense, previousExpense), tone: currentExpense <= previousExpense ? 'up' : 'down' },
+      { label: 'Savings', value: savings, change: pctChange(currentSavings, previousSavings), tone: currentSavings >= previousSavings ? 'up' : 'down' },
     ];
   }, [summary]);
 
@@ -168,7 +202,7 @@ const Dashboard = () => {
                 <option>Expenses</option>
               </select>
             </div>
-            <TransactionTable />
+            <TransactionTable transactions={transactions} />
           </article>
 
           <article className="dash-card glass insights-card">
@@ -226,7 +260,7 @@ const Dashboard = () => {
   );
 };
 
-const TransactionTable = () => (
+const TransactionTable = ({ transactions = [] }) => (
   <div className="txn-table-wrap">
     <table className="txn-table">
       <thead>
@@ -241,23 +275,25 @@ const TransactionTable = () => (
         </tr>
       </thead>
       <tbody>
-        {MOCK_TRANSACTIONS.map((transaction) => (
-          <tr key={`${transaction.name}-${transaction.date}`}>
-            <td><input type="checkbox" aria-label={`Select ${transaction.name}`} /></td>
-            <td>{transaction.name}</td>
+        {transactions.length === 0 ? (
+          <tr>
+            <td colSpan="7" className="dash-empty">No recent transactions found.</td>
+          </tr>
+        ) : transactions.map((transaction) => (
+          <tr key={`${transaction.type}-${transaction._id || transaction.description}-${transaction.date}`}>
+            <td><input type="checkbox" aria-label={`Select ${transaction.description}`} /></td>
+            <td>{transaction.description}</td>
             <td className={transaction.amount > 0 ? 'txn-pos' : 'txn-neg'}>
               {transaction.amount > 0 ? '+' : '-'}
               {formatMoney(Math.abs(transaction.amount))}
             </td>
             <td>{transaction.type}</td>
-            <td>{transaction.date}</td>
+            <td>{transaction.date ? new Date(transaction.date).toLocaleDateString() : '—'}</td>
             <td>
-              <span className={`status-chip ${transaction.status === 'Success' ? 'chip-success' : 'chip-pending'}`}>
-                {transaction.status}
-              </span>
+              <span className="status-chip chip-success">Success</span>
             </td>
             <td>
-              <button type="button" className="txn-action" aria-label={`Open ${transaction.name} actions`}>
+              <button type="button" className="txn-action" aria-label={`Open ${transaction.description} actions`}>
                 ...
               </button>
             </td>

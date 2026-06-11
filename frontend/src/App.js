@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Nav from './components/Nav';
@@ -15,6 +15,7 @@ import Home from './components/Home/homepage';
 import Activity from './components/Activity/activity';
 import Users from './components/Admin/Users';
 import ResetPassword from './components/ResetPassword';
+import api from './api';
 
 function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmin, handleLogin, handleLogout }) {
   const location = useLocation();
@@ -79,6 +80,26 @@ function App() {
     return savedUser ? JSON.parse(savedUser) : null;
   });
   const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('role') === 'admin');
+
+  useEffect(() => {
+    const verifySession = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        await api.get('/api/current-user');
+      } catch (error) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        setIsLoggedIn(false);
+        setUser(null);
+        setIsAdmin(false);
+      }
+    };
+
+    verifySession();
+  }, []);
 
   const handleLogin = (userData) => {
     const loggedInUser = userData.user || userData.admin || userData;

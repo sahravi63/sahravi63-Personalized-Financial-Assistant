@@ -18,10 +18,18 @@ const ExpenseList = ({ expenses = [], onUpdateExpense, onDeleteExpense }) => {
   };
 
   const handleUpdate = () => {
-    onUpdateExpense(editingId, {
-      description: editDescription.trim(),
-      amount: Number(editAmount),
-    });
+    const description = editDescription.trim();
+    const amount = Number(editAmount);
+
+    if (!description) {
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return;
+    }
+
+    onUpdateExpense(editingId, { description, amount });
     cancelEditing();
   };
 

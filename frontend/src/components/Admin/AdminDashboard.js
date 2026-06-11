@@ -27,7 +27,7 @@ const AdminDashboard = () => {
   }, []); // No dependencies for refreshToken
 
   // Function to verify token and fetch dashboard data
-  const verifyTokenAndFetchData = useCallback(async () => {
+  const verifyTokenAndFetchData = useCallback(async (retried = false) => {
     const token = localStorage.getItem('adminAccessToken') || localStorage.getItem('token');
     if (!token) {
       navigate('/admin-login');
@@ -38,10 +38,10 @@ const AdminDashboard = () => {
       await api.get('/admin/dashboard');
       setLoading(false); // Data fetched successfully
     } catch (err) {
-      if (err.response?.status === 403) {
+      if (err.response?.status === 403 && !retried) {
         const refreshed = await refreshToken();
         if (refreshed) {
-          await verifyTokenAndFetchData();
+          await verifyTokenAndFetchData(true);
         } else {
           navigate('/admin-login');
         }

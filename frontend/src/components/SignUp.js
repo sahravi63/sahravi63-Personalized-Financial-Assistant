@@ -62,9 +62,6 @@ const SignUp = () => {
 
     setError(""); // Clear error
 
-    // Log form data for debugging
-    console.warn(username, email, password); // Change name to username
-
     try {
       const { data: result } = await api.post('/api/register', { username, email, password });
       console.log("Server Response:", result);
