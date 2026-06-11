@@ -38,7 +38,7 @@ const Login = ({ onLogin }) => {
       localStorage.setItem('token', result.token);
 
       const isAdminUser = result?.user?.role === 'admin';
-      navigate(isAdminUser ? '/admin/dashboard' : '/mainpage');
+      navigate(isAdminUser ? '/admin/dashboard' : '/dashboard', { replace: true });
     } catch (error) {
       console.error('Error during login:', error);
       const message =

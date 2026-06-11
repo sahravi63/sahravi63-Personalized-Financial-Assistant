@@ -1,5 +1,6 @@
 import React from 'react';
-import './homePage.css'; // Importing the CSS file
+import { Link } from 'react-router-dom';
+import './homePage.css';
 
 const HomePage = () => {
   return (
@@ -12,7 +13,10 @@ const HomePage = () => {
         />
         <h1>Welcome to Your Personalized Financial Assistant</h1>
         <p>Manage your finances effortlessly with tailored advice and insights.</p>
-        <button className="get-started-button">Get Started</button>
+        <div className="auth-cta-group" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link to="/signup" className="get-started-button">Sign Up</Link>
+          <Link to="/login" className="get-started-button">Login</Link>
+        </div>
       </header>
 
       <section className="features-section">

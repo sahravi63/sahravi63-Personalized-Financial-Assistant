@@ -28,7 +28,6 @@ const getInitials = (name, username) => {
 };
 
 const ProfileComponent = ({ user: propUser, onLogout }) => {
-  const [profilePic, setProfilePic]   = useState('');
   const [userName,   setUserName]     = useState('');
   const [username,   setUsername]     = useState(''); // read-only display
   const [email,      setEmail]        = useState(''); // read-only display
@@ -45,12 +44,16 @@ const ProfileComponent = ({ user: propUser, onLogout }) => {
       setLoading(true);
       try {
         const { data } = await api.get('/api/current-user');
-        setUserName(data.name     || '');
-        setUsername(data.username || propUser?.username || '');
-        setEmail(data.email       || propUser?.email    || '');
-        const picUrl = getProfileImageUrl(data.profilePic);
-        setProfilePic(picUrl);
-        setPreviewUrl(picUrl);
+        const safeUser = data || {};
+        const initialName = safeUser.name || propUser?.name || '';
+        const initialUsername = safeUser.username || propUser?.username || '';
+        const initialEmail = safeUser.email || propUser?.email || '';
+        const picUrl = getProfileImageUrl(safeUser.profilePic || propUser?.profilePic);
+
+        setUserName(initialName);
+        setUsername(initialUsername);
+        setEmail(initialEmail);
+        setPreviewUrl(picUrl || '');
       } catch (error) {
         setMessage({ text: 'Failed to load profile.', type: 'error' });
         console.error('fetchProfile error:', error.response?.data || error.message);
@@ -89,7 +92,6 @@ const ProfileComponent = ({ user: propUser, onLogout }) => {
       const updated = data.user;
       setUserName(updated?.name || userName);
       const newPicUrl = getProfileImageUrl(updated?.profilePic);
-      setProfilePic(newPicUrl || previewUrl);
       if (newPicUrl) setPreviewUrl(newPicUrl);
       setFile(null);
       setMessage({ text: 'Profile updated successfully!', type: 'success' });
@@ -103,7 +105,7 @@ const ProfileComponent = ({ user: propUser, onLogout }) => {
 
   const handleLogout = () => {
     onLogout();
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   /* ── Render ── */

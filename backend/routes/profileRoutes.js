@@ -56,7 +56,12 @@ router.get('/current-user', authenticateToken, async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json({ name: user.name, profilePic: user.profilePic });
+    res.json({
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch user data' });
   }
