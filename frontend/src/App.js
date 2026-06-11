@@ -12,6 +12,7 @@ import DashBoard from './components/DashBoard/dashboard';
 import MainPage from './components/mainpage/mainpage';
 import Profile from './components/profile';
 import Home from './components/Home/homepage';
+import Activity from './components/Activity/activity';
 import Users from './components/Admin/Users';
 import ResetPassword from './components/ResetPassword';
 
@@ -41,6 +42,10 @@ function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmi
           <Route
             path="/mainpage"
             element={isLoggedIn ? <MainPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/activity"
+            element={isLoggedIn && !isAdmin ? <Activity /> : <Navigate to="/login" />}
           />
           <Route
             path="/profile"

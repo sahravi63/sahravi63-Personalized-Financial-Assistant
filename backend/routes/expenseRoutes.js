@@ -16,15 +16,25 @@ router.post('/expenses',
   body('description').trim().notEmpty().withMessage('Description is required'),
   body('amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number'),
   body('category').optional().trim(),
+  body('paymentMethod').optional().trim(),
+  body('paymentProvider').optional().trim(),
+  body('upiId').optional().trim(),
+  body('cardLast4').optional().trim(),
+  body('cardHolder').optional().trim(),
   validate,
   async (req, res) => {
     try {
-      const { description, amount, category, date } = req.body;
+      const { description, amount, category, date, paymentMethod, paymentProvider, upiId, cardLast4, cardHolder } = req.body;
       const expense = await Expense.create({
         userId: req.user._id,
         description,
         amount,
         category: category || 'General',
+        paymentMethod,
+        paymentProvider,
+        upiId,
+        cardLast4,
+        cardHolder,
         date: date ? new Date(date) : undefined,
       });
       res.status(201).json(expense);
