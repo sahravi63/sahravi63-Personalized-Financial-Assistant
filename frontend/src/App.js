@@ -12,7 +12,12 @@ import DashBoard from './components/DashBoard/dashboard';
 import MainPage from './components/mainpage/mainpage';
 import Profile from './components/profile';
 import Home from './components/Home/homepage';
+import ChatWidget from './components/ChatWidget';
 import Activity from './components/Activity/activity';
+import Budgets from './components/Budgets/Budgets';
+import Calculators from './components/Calculators/Calculators';
+import Goals from './components/Goals/Goals';
+import Investment from './components/Investment/Investment';
 import Users from './components/Admin/Users';
 import ResetPassword from './components/ResetPassword';
 import api from './api';
@@ -49,6 +54,22 @@ function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmi
             element={isLoggedIn && !isAdmin ? <Activity /> : <Navigate to="/login" />}
           />
           <Route
+            path="/budgets"
+            element={isLoggedIn && !isAdmin ? <Budgets /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/calculators"
+            element={isLoggedIn && !isAdmin ? <Calculators /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/goals"
+            element={isLoggedIn && !isAdmin ? <Goals /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/investment"
+            element={isLoggedIn && !isAdmin ? <Investment /> : <Navigate to="/login" />}
+          />
+          <Route
             path="/profile"
             element={isLoggedIn && !isAdmin ? <Profile user={user} onLogout={handleLogout} /> : <Navigate to="/" />}
           />
@@ -69,6 +90,7 @@ function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmi
         </Routes>
       </div>
       {!showSidebar && !isHomePage && <Footer />}
+      {isLoggedIn && !isAdmin && <ChatWidget />}
     </div>
   );
 }

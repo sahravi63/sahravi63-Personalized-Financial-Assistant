@@ -8,6 +8,10 @@ const NAV_ITEMS = [
   { label: 'Profile', to: '/profile', icon: 'PF' },
   { label: 'Cards', to: '/dashboard', icon: 'CD' },
   { label: 'Activity', to: '/activity', icon: 'AC' },
+  { label: 'Budgets', to: '/budgets', icon: 'BD' },
+  { label: 'Goals', to: '/goals', icon: 'GL' },
+  { label: 'Calculators', to: '/calculators', icon: 'CL' },
+  { label: 'Investment', to: '/investment', icon: 'IV' },
 ];
 
 const Sidebar = ({ user, onLogout }) => (

@@ -2,6 +2,7 @@ const express = require('express');
 const authenticateToken = require('../middleware/authenticateToken');
 const Expense = require('../db/Expense');
 const Income = require('../db/Income');
+const { getAIResponse } = require('../services/aiService');
 
 const router = express.Router();
 
@@ -32,13 +33,45 @@ router.get('/insights', authenticateToken, async (req, res) => {
       ? `${topCategory[0]} at $${topCategory[1].toFixed(2)}`
       : 'no expenses recorded';
 
-    const insight = [
+    const fallbackInsight = [
       `Over the last 3 months you spent ${spendRatio}% of your income.`,
       savings >= 0
         ? `You saved $${savings.toFixed(2)} during this period. Keep protecting that gap.`
         : `Your expenses exceeded income by $${Math.abs(savings).toFixed(2)}. Review flexible categories first.`,
       `Top spending category: ${topCategoryText}.`,
     ].join('\n');
+
+    const aiPrompt = `You are a concise financial advisor. Analyze the user's recent spending and income summary. Return a short, practical insight in plain English. Do not mention you are an AI.\n\nInputs:\n- totalExpenses: ${totalExpenses.toFixed(2)}\n- totalIncome: ${totalIncome.toFixed(2)}\n- savings: ${savings.toFixed(2)}\n- spendRatio: ${spendRatio}%\n- topCategory: ${topCategoryText}\n- categories: ${JSON.stringify(categoryTotals)}`;
+
+    let insight = fallbackInsight;
+    try {
+      const aiText = await getAIResponse(
+        'You are a helpful personal finance advisor for a student budget app.',
+        aiPrompt
+      );
+
+      const cleaned = (aiText || '').replace(/```json|```/g, '').trim();
+      if (cleaned) {
+        const parsed = (() => {
+          try {
+            return JSON.parse(cleaned);
+          } catch (error) {
+            return null;
+          }
+        })();
+
+        if (parsed && typeof parsed === 'object') {
+          const recommendations = Array.isArray(parsed.recommendations) && parsed.recommendations.length
+            ? parsed.recommendations.join(' ')
+            : '';
+          insight = [parsed.insight || parsed.summary || fallbackInsight, recommendations].filter(Boolean).join('\n');
+        } else if (cleaned) {
+          insight = cleaned;
+        }
+      }
+    } catch (aiError) {
+      console.warn('AI insights unavailable, using fallback insight:', aiError.message || aiError);
+    }
 
     res.json({ insight });
   } catch (err) {

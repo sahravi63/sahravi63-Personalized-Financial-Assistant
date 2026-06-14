@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
 
+const formatMoney = (value = 0) =>
+  Number(value || 0).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 const IncomeList = ({ incomes = [], onUpdateIncome, onDeleteIncome }) => {
   const [editingId, setEditingId] = useState(null);
   const [editDescription, setEditDescription] = useState('');
@@ -34,17 +42,18 @@ const IncomeList = ({ incomes = [], onUpdateIncome, onDeleteIncome }) => {
   };
 
   if (incomes.length === 0) {
-    return <p>No incomes found.</p>;
+    return <p className="manage-empty">No income recorded yet.</p>;
   }
 
   return (
-    <ul className="transaction-list">
+    <ul className="manage-list">
       {incomes.map((income) => (
-        <li key={income._id} className="transaction-item">
+        <li key={income._id} className="manage-item">
           {editingId === income._id ? (
-            <div className="transaction-edit">
+            <div className="manage-edit-row">
               <input
                 type="text"
+                className="manage-input"
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 placeholder="Description"
@@ -53,22 +62,55 @@ const IncomeList = ({ incomes = [], onUpdateIncome, onDeleteIncome }) => {
                 type="number"
                 min="0"
                 step="0.01"
+                className="manage-input manage-input--amount"
                 value={editAmount}
                 onChange={(e) => setEditAmount(e.target.value)}
                 placeholder="Amount"
               />
-              <button type="button" onClick={handleUpdate}>Save</button>
-              <button type="button" onClick={cancelEditing}>Cancel</button>
+              <div className="manage-edit-actions">
+                <button type="button" className="manage-save-btn" onClick={handleUpdate}>
+                  Save
+                </button>
+                <button type="button" className="manage-cancel-btn" onClick={cancelEditing}>
+                  Cancel
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="transaction-row">
-              <span>
-                {income.description}: ${Number(income.amount).toFixed(2)}
-                {income.date && ` on ${new Date(income.date).toLocaleDateString()}`}
+            <div className="manage-item-row">
+              <div className="manage-item-main">
+                <span className="manage-item-desc">{income.description}</span>
+                <div className="manage-item-meta">
+                  {income.category && (
+                    <span className="manage-item-category">{income.category}</span>
+                  )}
+                  {income.date && (
+                    <span className="manage-item-date">
+                      {new Date(income.date).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <span className="manage-item-amount manage-item-amount--income">
+                +{formatMoney(income.amount)}
               </span>
-              <div className="transaction-actions">
-                <button type="button" onClick={() => startEditing(income)}>Edit</button>
-                <button type="button" onClick={() => onDeleteIncome(income._id)}>Delete</button>
+              <div className="manage-item-actions">
+                <button
+                  type="button"
+                  className="manage-action-btn"
+                  onClick={() => startEditing(income)}
+                  aria-label={`Edit ${income.description}`}
+                >
+                  ✎
+                </button>
+                <button
+                  type="button"
+                  className="manage-action-btn manage-action-btn--delete"
+                  onClick={() => onDeleteIncome(income._id)}
+                  aria-label={`Delete ${income.description}`}
+                >
+                  ✕
+                </button>
               </div>
             </div>
           )}

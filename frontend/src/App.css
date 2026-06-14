@@ -84,11 +84,18 @@ body {
 .content {
   flex: 1;  /* Main content area takes up the remaining space */
   min-width: 0;
+  padding-bottom: 32px;
 }
 
 .App--with-sidebar .content {
   margin-left: 220px;
   overflow-x: hidden;
+}
+
+@media (max-width: 980px) {
+  .App--with-sidebar .content {
+    margin-left: 0;
+  }
 }
 
 .glass {

@@ -29,22 +29,39 @@ const AddIncome = ({ onAddIncome }) => {
   };
 
   return (
-    <div>
-      <h2>Add Income</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Description" value={description}
-          onChange={(e) => setDescription(e.target.value)} required />
-        <input type="number" placeholder="Amount" value={amount} min="0.01" step="0.01"
-          onChange={(e) => setAmount(e.target.value)} required />
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {['General','Salary','Freelance','Investment','Gift','Other']
-            .map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {success && <p style={{ color: 'green' }}>{success}</p>}
-        <button type="submit">Add Income</button>
-      </form>
-    </div>
+    <form className="manage-form" onSubmit={handleSubmit}>
+      <h3>New Income</h3>
+      <div className="manage-form-row">
+        <input
+          type="text"
+          className="manage-input"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
+        <input
+          type="number"
+          className="manage-input"
+          placeholder="Amount"
+          value={amount}
+          min="0.01"
+          step="0.01"
+          onChange={(e) => setAmount(e.target.value)}
+          required
+        />
+      </div>
+      <select className="manage-select" value={category} onChange={(e) => setCategory(e.target.value)}>
+        {['General', 'Salary', 'Freelance', 'Investment', 'Gift', 'Other'].map((c) => (
+          <option key={c} value={c}>{c}</option>
+        ))}
+      </select>
+      {error && <p className="manage-form-error">{error}</p>}
+      {success && <p className="manage-form-success">{success}</p>}
+      <button type="submit" className="manage-submit-btn manage-submit-btn--income">
+        Add Income
+      </button>
+    </form>
   );
 };
 
