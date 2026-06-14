@@ -73,8 +73,9 @@ const SignUp = () => {
         setError(result.error || "Registration failed. Please try again.");
       }
     } catch (error) {
+      const msg = error?.response?.data?.error || "Registration failed. Please try again.";
       console.error("Error during registration:", error);
-      setError("Registration failed. Please try again.");
+      setError(msg);
     }
   }
 

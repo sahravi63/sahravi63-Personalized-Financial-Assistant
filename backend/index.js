@@ -12,7 +12,7 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:3001,https://finance-tawny.vercel.app')
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:3001')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);

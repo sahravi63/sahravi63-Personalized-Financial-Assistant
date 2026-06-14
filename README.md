@@ -373,7 +373,8 @@ Separate admin flow: `AdminLogin.js` authenticates against `/admin/login`, `Admi
 | `PORT` | No | `8080` | Port the Express server listens on |
 | `CORS_ORIGIN` | No | `http://localhost:3000,...` | Comma-separated list of allowed origins |
 | `EMAIL_USER` | Yes (for password reset) | — | SMTP username for Nodemailer |
-| `EMAIL_PASS` | Yes (for password reset) | — | SMTP password for Nodemailer |
+| `EMAIL_PASS` | Yes (for password reset) | — | SMTP password for Nodemailer. Gmail requires a 16-character app password, not the regular Gmail account password. |
+| `EMAIL_MODE` | No | `smtp` | Use `console` locally to print password reset links in the backend terminal instead of sending email. |
 
 ### Frontend (`frontend/.env.development`)
 
@@ -416,8 +417,12 @@ JWT_SECRET=your_super_secret_key_here
 PORT=8080
 CORS_ORIGIN=http://localhost:3000
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
+EMAIL_PASS=your_16_character_gmail_app_password
+EMAIL_MODE=smtp
 ```
+
+For Gmail password reset emails, enable 2-Step Verification on the Gmail account, create an App Password, and put that generated 16-character password in `EMAIL_PASS`.
+For local reset testing without SMTP, set `EMAIL_MODE=console`, restart the backend, request a reset, and copy the reset link printed in the backend terminal.
 
 Start the backend:
 
@@ -509,7 +514,7 @@ Set all environment variables listed in [Environment Variables](#environment-var
 2. Set `REACT_APP_API_URL` to your deployed backend URL in Vercel environment variables.
 3. Vercel auto-detects CRA and runs `npm run build`.
 
-The live frontend is currently deployed at `https://finance-tawny.vercel.app`.
+The live frontend is currently deployed at `https://sahravi63-personalized-financial-as.vercel.app/`.
 
 ---
 

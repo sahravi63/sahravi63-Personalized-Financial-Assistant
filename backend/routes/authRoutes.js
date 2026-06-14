@@ -17,13 +17,19 @@ const validate = (req, res, next) => {
   next();
 };
 
+const emailUser = process.env.EMAIL_USER?.trim();
+const emailPass = process.env.EMAIL_PASS?.trim();
+const emailMode = process.env.EMAIL_MODE?.trim().toLowerCase() || 'smtp';
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: emailUser,
+    pass: emailPass,
   },
 });
+
+const isEmailConfigured = () => emailMode === 'console' || Boolean(emailUser && emailPass);
 
 // POST /api/register
 router.post('/register', authLimiter,
@@ -87,6 +93,12 @@ router.post('/reset-password-request', authLimiter,
   async (req, res) => {
     const { email } = req.body;
     try {
+      if (!isEmailConfigured()) {
+        return res.status(503).json({
+          error: 'Password reset email is not configured. Set EMAIL_USER and EMAIL_PASS in backend/.env.',
+        });
+      }
+
       const user = await User.findOne({ email });
       // Don't reveal whether the email exists
       if (!user) return res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
@@ -98,12 +110,29 @@ router.post('/reset-password-request', authLimiter,
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
       const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Password Reset Request',
-        text: `Click the following link to reset your password (expires in 1 hour): ${resetUrl}`,
-      });
+
+      if (emailMode === 'console') {
+        console.log(`Password reset link for ${email}: ${resetUrl}`);
+        return res.status(200).json({ message: 'Reset link generated. Check the backend console.' });
+      }
+
+      try {
+        await transporter.sendMail({
+          from: emailUser,
+          to: email,
+          subject: 'Password Reset Request',
+          text: `Click the following link to reset your password (expires in 1 hour): ${resetUrl}`,
+        });
+      } catch (mailError) {
+        console.error(
+          'Reset email could not be sent:',
+          mailError.code || 'SMTP_ERROR',
+          mailError.response || mailError.message
+        );
+        return res.status(503).json({
+          error: 'Password reset email could not be sent. Check EMAIL_USER and EMAIL_PASS (Gmail requires an app password).',
+        });
+      }
 
       res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
     } catch (err) {

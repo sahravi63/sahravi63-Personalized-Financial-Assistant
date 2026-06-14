@@ -1,14 +1,6 @@
 import axios from 'axios';
 
-/**
- * Single axios instance for the whole frontend.
- * Set REACT_APP_API_URL in your .env files:
- *   .env.development  →  REACT_APP_API_URL=http://localhost:5000
- *   .env.production   →  REACT_APP_API_URL=https://your-backend.vercel.app
- *
- * Every component should import this instead of calling
- * axios directly with a hardcoded URL.
- */
+
 const DEFAULT_API_URL = 'http://localhost:8080';
 
 const api = axios.create({
