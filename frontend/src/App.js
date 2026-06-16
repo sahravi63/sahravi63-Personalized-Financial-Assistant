@@ -24,18 +24,22 @@ import api from './api';
 
 function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmin, handleLogin, handleLogout }) {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
+  const pathname = location.pathname;
+  const isHomePage = pathname === '/';
+  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const showFooter = isHomePage || isAuthPage;
   const showSidebar = isLoggedIn && !isAdmin && !isHomePage;
 
   return (
-    <div className={`App ${showSidebar ? 'App--with-sidebar' : ''}`}>
-      {showSidebar ? (
-        <Sidebar user={user} onLogout={handleLogout} />
-      ) : !isHomePage ? (
-        <Nav isLoggedIn={isLoggedIn} user={user} isAdmin={isAdmin} onLogout={handleLogout} />
-      ) : null}
-      <div className="content">
-        <Routes>
+    <div className="app-shell">
+      <div className={`App ${showSidebar ? 'App--with-sidebar' : ''}`}>
+        {showSidebar ? (
+          <Sidebar user={user} onLogout={handleLogout} />
+        ) : !isHomePage ? (
+          <Nav isLoggedIn={isLoggedIn} user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+        ) : null}
+        <main className="content">
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route
             path="/dashboard"
@@ -87,9 +91,10 @@ function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmi
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/contact-us" element={<h1>Contact Us</h1>} />
           <Route path="*" element={<h1>404 - Not Found</h1>} />
-        </Routes>
+          </Routes>
+        </main>
       </div>
-      {!showSidebar && !isHomePage && <Footer />}
+      {showFooter && <Footer />}
       {isLoggedIn && !isAdmin && <ChatWidget />}
     </div>
   );

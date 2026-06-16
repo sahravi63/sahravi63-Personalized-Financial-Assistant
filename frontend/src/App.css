@@ -74,21 +74,35 @@ body {
   height: 85%; /* Expand the background underline on hover */
 }
 
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .App {
   display: flex;
   flex-direction: column;
+  flex: 1 0 auto;
   min-height: 100vh;
   text-align: center;
 }
 
 .content {
-  flex: 1;  /* Main content area takes up the remaining space */
+  flex: 1 0 auto;
   min-width: 0;
   padding-bottom: 32px;
 }
 
+.App--with-sidebar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
 .App--with-sidebar .content {
-  margin-left: 220px;
+  flex: 1 1 auto;
+  margin-left: 0;
   overflow-x: hidden;
 }
 
