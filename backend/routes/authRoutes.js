@@ -103,13 +103,14 @@ router.post('/reset-password-request', authLimiter,
       // Don't reveal whether the email exists
       if (!user) return res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
 
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      user.resetToken = resetToken;
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+      user.resetToken = hashedToken;
       user.resetTokenExpiration = Date.now() + 3600000; // 1 hour
       await user.save();
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+      const resetUrl = `${frontendUrl}/reset-password/${rawToken}`;
 
       if (emailMode === 'console') {
         console.log(`Password reset link for ${email}: ${resetUrl}`);
@@ -150,8 +151,9 @@ router.post('/reset-password',
   async (req, res) => {
     const { token, newPassword } = req.body;
     try {
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
       const user = await User.findOne({
-        resetToken: token,
+        resetToken: hashedToken,
         resetTokenExpiration: { $gt: Date.now() },
       });
       if (!user) return res.status(400).json({ error: 'Invalid or expired token' });

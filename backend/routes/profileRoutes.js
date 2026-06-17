@@ -1,11 +1,27 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const router = express.Router();
 const User = require('../db/User');
 const authenticateToken = require('../middleware/authenticateToken');
 const multer = require('multer');
 
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, safeName);
+  },
+});
+
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -20,14 +36,12 @@ const upload = multer({
 // Update profile endpoint
 router.post('/updateProfile', authenticateToken, upload.single('profilePic'), async (req, res) => {
   const { name } = req.body;
-  const profilePic = req.file
-    ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`
-    : null;
+  const profilePicUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
     const updateData = { name };
-    if (profilePic) {
-      updateData.profilePic = profilePic;
+    if (profilePicUrl) {
+      updateData.profilePic = profilePicUrl;
     }
 
     const updatedUser = await User.findByIdAndUpdate(req.user.id, updateData, { new: true });

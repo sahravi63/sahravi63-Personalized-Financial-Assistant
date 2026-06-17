@@ -292,7 +292,7 @@ const TransactionTable = ({ transactions = [] }) => (
               {formatMoney(Math.abs(transaction.amount))}
             </td>
             <td>{transaction.type}</td>
-            <td>{transaction.date ? new Date(transaction.date).toLocaleDateString() : '—'}</td>
+            <td>{transaction.date ? new Date(transaction.date).toLocaleDateString() : '-'}</td>
             <td>
               <span className="status-chip chip-success">Success</span>
             </td>

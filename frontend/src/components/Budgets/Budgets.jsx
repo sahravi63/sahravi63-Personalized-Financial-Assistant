@@ -50,18 +50,18 @@ export default function Budgets() {
   }, [budgets, status]);
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ width: '100%', padding: 'clamp(14px, 3vw, 24px)', maxWidth: 1100, margin: '0 auto', boxSizing: 'border-box' }}>
       <h2>Budgets</h2>
       <p style={{ color: '#cbd5e1' }}>Track monthly caps by category and compare them with actual spend.</p>
       {message ? <p style={{ color: '#93c5fd' }}>{message}</p> : null}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 16, marginBottom: 24 }}>
         <article style={cardStyle}><strong>Total limit</strong><div style={bigText}>₹{summary.totalLimit.toFixed(2)}</div></article>
         <article style={cardStyle}><strong>Total spent</strong><div style={bigText}>₹{summary.totalSpent.toFixed(2)}</div></article>
         <article style={cardStyle}><strong>Remaining</strong><div style={bigText}>₹{summary.remaining.toFixed(2)}</div></article>
       </div>
 
-      <div style={{ display: 'grid', gap: 24, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
         <section style={panelStyle}>
           <h3>Create budget</h3>
           <form onSubmit={handleCreate} style={{ display: 'grid', gap: 12 }}>
@@ -92,11 +92,11 @@ export default function Budgets() {
   );
 }
 
-const cardStyle = { background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 18, padding: 16 };
+const cardStyle = { minWidth: 0, background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 8, padding: 16 };
 const bigText = { fontSize: 28, fontWeight: 700, marginTop: 6 };
-const panelStyle = { background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 18, padding: 18 };
-const inputStyle = { borderRadius: 10, border: '1px solid #334155', background: '#0f172a', color: '#fff', padding: '10px 12px' };
-const buttonStyle = { borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #60a5fa, #8b5cf6)', color: '#fff', padding: '10px 12px', cursor: 'pointer' };
-const itemCardStyle = { marginTop: 12, background: 'rgba(15,23,42,0.7)', border: '1px solid #334155', borderRadius: 14, padding: 12 };
+const panelStyle = { minWidth: 0, background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 8, padding: 18 };
+const inputStyle = { width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid #334155', background: '#0f172a', color: '#fff', padding: '10px 12px' };
+const buttonStyle = { minHeight: 44, borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #60a5fa, #8b5cf6)', color: '#fff', padding: '10px 12px', cursor: 'pointer' };
+const itemCardStyle = { minWidth: 0, marginTop: 12, background: 'rgba(15,23,42,0.7)', border: '1px solid #334155', borderRadius: 8, padding: 12 };
 const meterStyle = { height: 8, background: '#1f2937', borderRadius: 999, overflow: 'hidden', marginTop: 8 };
 const fillStyle = { display: 'block', height: '100%', background: 'linear-gradient(135deg, #38bdf8, #818cf8)' };

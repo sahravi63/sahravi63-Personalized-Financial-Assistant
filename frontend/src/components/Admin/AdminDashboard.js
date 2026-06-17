@@ -16,6 +16,9 @@ const AdminDashboard = () => {
       const response = await api.post('/admin/refresh-token', { token: refreshToken });
       if (response.data.accessToken) {
         localStorage.setItem('adminAccessToken', response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem('adminRefreshToken', response.data.refreshToken);
+        }
         return true;
       } else {
         return false;
@@ -38,13 +41,8 @@ const AdminDashboard = () => {
       await api.get('/admin/dashboard');
       setLoading(false); // Data fetched successfully
     } catch (err) {
-      if (err.response?.status === 403 && !retried) {
-        const refreshed = await refreshToken();
-        if (refreshed) {
-          await verifyTokenAndFetchData(true);
-        } else {
-          navigate('/admin-login');
-        }
+      if (err.response?.status === 403 || err.response?.status === 401) {
+        navigate('/admin-login');
       } else {
         setError('Failed to fetch dashboard data');
         setLoading(false);

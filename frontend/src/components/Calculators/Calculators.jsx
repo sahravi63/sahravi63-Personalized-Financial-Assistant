@@ -29,10 +29,10 @@ export default function Calculators() {
   }, [retirement]);
 
   return (
-    <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ width: '100%', padding: 'clamp(14px, 3vw, 24px)', maxWidth: 1200, margin: '0 auto', boxSizing: 'border-box' }}>
       <h2>Financial Calculators</h2>
       <p style={{ color: '#cbd5e1' }}>Fast formulas for planning, borrowing, and retirement.</p>
-      <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+      <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
         <Card title="SIP Calculator" body={<>
           <Input label="Monthly investment" value={sip.monthly} onChange={(e) => setSip({ ...sip, monthly: Number(e.target.value) })} />
           <Input label="Expected annual return (%)" value={sip.rate} onChange={(e) => setSip({ ...sip, rate: Number(e.target.value) })} />
@@ -65,6 +65,6 @@ function Card({ title, body }) {
 function Input({ label, value, onChange }) { return <label style={{ display: 'grid', gap: 4, marginBottom: 8 }}><span style={{ color: '#bfdbfe', fontSize: 13 }}>{label}</span><input value={value} onChange={onChange} style={inputStyle} type="number" /></label>; }
 function Result({ label, value }) { return <div style={resultStyle}><strong>{label}</strong><span>{value}</span></div>; }
 
-const cardStyle = { background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 18, padding: 18 };
-const inputStyle = { borderRadius: 10, border: '1px solid #334155', background: '#0f172a', color: '#fff', padding: '10px 12px' };
-const resultStyle = { display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 0', borderTop: '1px solid #334155', color: '#e5eefb' };
+const cardStyle = { minWidth: 0, background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 8, padding: 18 };
+const inputStyle = { width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid #334155', background: '#0f172a', color: '#fff', padding: '10px 12px' };
+const resultStyle = { display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 0', borderTop: '1px solid #334155', color: '#e5eefb', flexWrap: 'wrap' };

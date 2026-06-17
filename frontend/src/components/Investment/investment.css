@@ -6,10 +6,13 @@
 /* page wrapper */
 .inv-page {
   padding: 1.5rem 1.75rem 3rem;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   color: #e2e5ea;
   font-family: "Inter", "Segoe UI", sans-serif;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 /* ── header ────────────────────────────────────────────────────────────────── */
@@ -88,6 +91,7 @@
   border: 1px solid #2a2f3e;
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
+  min-width: 0;
 }
 
 /* ── section titles ────────────────────────────────────────────────────────── */
@@ -122,7 +126,7 @@
 
 .inv-form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
   gap: 0.875rem;
 }
 
@@ -292,7 +296,7 @@
 
 .inv-charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1rem;
   margin-bottom: 1.25rem;
 }
@@ -386,6 +390,7 @@
 
 .inv-table {
   width: 100%;
+  min-width: 780px;
   border-collapse: collapse;
   font-size: 0.875rem;
   white-space: nowrap;
@@ -499,10 +504,64 @@
 /* ── responsive ──────────────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-  .inv-page           { padding: 1rem 1rem 2.5rem; }
-  .inv-title          { font-size: 1.25rem; }
-  .inv-card-value     { font-size: 1.2rem; }
-  .inv-charts-grid    { grid-template-columns: 1fr; }
-  .inv-summary-grid   { grid-template-columns: repeat(2, 1fr); }
-  .inv-count          { display: none; }
+  .inv-page {
+    padding: 1rem 1rem 2.5rem;
+  }
+
+  .inv-title {
+    font-size: 1.25rem;
+  }
+
+  .inv-card-value {
+    font-size: 1.2rem;
+  }
+
+  .inv-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inv-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inv-count {
+    display: none;
+  }
+
+  .inv-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .inv-form-actions {
+    justify-content: stretch;
+  }
+
+  .inv-btn-primary,
+  .inv-btn-ghost {
+    width: 100%;
+  }
+
+  .inv-filter-group,
+  .inv-filter-group select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .inv-page {
+    padding: 0.875rem 0.75rem 2rem;
+  }
+
+  .inv-card {
+    padding: 1rem;
+  }
+
+  .inv-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inv-table th,
+  .inv-table td {
+    padding: 0.65rem 0.5rem;
+  }
 }

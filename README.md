@@ -1,6 +1,6 @@
 # 💸 Personalized Financial Assistant
 
-A full-stack MERN web application that helps users track income and expenses, visualize spending patterns, manage their financial health, and receive AI-generated insights — all secured behind JWT-based authentication with role-based access control.
+A full-stack MERN web application that helps users track income and expenses, visualize spending patterns, manage their financial health, and receive rule-based spending insights — all secured behind JWT-based authentication with role-based access control.
 
 > **GitHub:** [sahravi63/sahravi63-Personalized-Financial-Assistant](https://github.com/sahravi63/sahravi63-Personalized-Financial-Assistant)
 > **Version:** 2.0.0 · **Author:** Ravi Sah (Narayan) · SRM IST Chennai, Batch 2023–2027
@@ -34,7 +34,7 @@ A full-stack MERN web application that helps users track income and expenses, vi
 - **Dashboard** with real-time income vs. expense bar charts (Chart.js), a savings gauge, and monthly breakdowns
 - **Income Tracking** — add, list, and delete income entries with category, date, and description
 - **Expense Tracking** — add, list, and delete expense entries with category, date, and description
-- **Financial Insights** — AI-generated 3-month spending analysis (spend ratio, top category, savings/deficit summary)
+- **Financial Insights** — Rule-based 3-month spending analysis (spend ratio, top category, savings/deficit summary)
 - **Profile Management** — update display name and upload a profile picture (JPEG/PNG/GIF, max 5 MB)
 - **Sidebar Navigation** — persistent collapsible sidebar shown to logged-in regular users
 - **Responsive Design** — dark-theme UI that works on mobile and desktop
@@ -68,9 +68,7 @@ A full-stack MERN web application that helps users track income and expenses, vi
 ```
 financial-assistant-fixed/
 ├── backend/
-│   ├── controllers/
-│   │   ├── expenseController.js     # CRUD logic for expenses
-│   │   └── incomeController.js      # CRUD logic for incomes
+│   ├── controllers/                 # removed legacy endpoint controllers; expense/income logic now lives in standalone routes
 │   ├── db/
 │   │   ├── config.js                # Mongoose connection helper
 │   │   ├── Admin.js                 # Admin model
@@ -178,7 +176,7 @@ Express REST API  (port 8080 default, fallback to next free port)
 **Auth flow:**
 
 1. User signs up / logs in → server issues a JWT signed with `JWT_SECRET`.
-2. Frontend stores the JWT in `localStorage` and attaches it as `Authorization: Bearer <token>` on every Axios request via a request interceptor.
+2. Frontend stores the JWT access token in `localStorage` and attaches it as `Authorization: Bearer <token>` on every Axios request via a request interceptor. Admin refresh tokens are rotated by the backend and validated on refresh requests.
 3. `authenticateToken` middleware verifies the token, looks up the full User document, and attaches it to `req.user`.
 4. On 401 response, the Axios response interceptor removes the token and redirects to `/login`.
 
@@ -230,7 +228,7 @@ All user routes are prefixed with `/api`. All routes marked 🔒 require `Author
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/api/insights` | 🔒 | AI-style 3-month textual financial insight. Returns `{ insight }` (multi-line string) |
+| GET | `/api/insights` | 🔒 | Rule-based 3-month spending analysis. Returns `{ insight }` (multi-line string) |
 
 ### Admin
 
@@ -523,7 +521,6 @@ The live frontend is currently deployed at `https://sahravi63-personalized-finan
 ### Current Limitations
 
 - **Profile picture persistence on Vercel:** Multer writes to the local `uploads/` directory, which is ephemeral on serverless platforms. Needs cloud storage integration.
-- **No token refresh:** JWTs are not refreshed; users are logged out when the token expires.
 - **Admin JWT separate from user JWT:** Admin and user tokens are managed separately, which adds code complexity. A unified RBAC approach would be cleaner.
 - **No pagination:** The income and expense list endpoints return all records for a user; large datasets will slow down response time.
 

@@ -43,11 +43,11 @@ export default function Goals() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ width: '100%', padding: 'clamp(14px, 3vw, 24px)', maxWidth: 1100, margin: '0 auto', boxSizing: 'border-box' }}>
       <h2>Goals</h2>
       <p style={{ color: '#cbd5e1' }}>Create savings targets and see the monthly amount needed to stay on track.</p>
       {message ? <p style={{ color: '#bfdbfe' }}>{message}</p> : null}
-      <div style={{ display: 'grid', gap: 18, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
         <section style={panelStyle}>
           <h3>Add goal</h3>
           <form onSubmit={createGoal} style={{ display: 'grid', gap: 10 }}>
@@ -79,9 +79,9 @@ export default function Goals() {
   );
 }
 
-const panelStyle = { background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 18, padding: 18 };
-const inputStyle = { borderRadius: 10, border: '1px solid #334155', background: '#0f172a', color: '#fff', padding: '10px 12px' };
-const buttonStyle = { borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #60a5fa, #8b5cf6)', color: '#fff', padding: '10px 12px', cursor: 'pointer', fontWeight: 700 };
-const itemStyle = { background: 'rgba(15, 23, 42, 0.7)', border: '1px solid #334155', borderRadius: 14, padding: 12, marginBottom: 10 };
+const panelStyle = { minWidth: 0, background: 'linear-gradient(145deg, #111827, #1f2937)', border: '1px solid #334155', borderRadius: 8, padding: 18 };
+const inputStyle = { width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid #334155', background: '#0f172a', color: '#fff', padding: '10px 12px' };
+const buttonStyle = { minHeight: 44, borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #60a5fa, #8b5cf6)', color: '#fff', padding: '10px 12px', cursor: 'pointer', fontWeight: 700 };
+const itemStyle = { minWidth: 0, background: 'rgba(15, 23, 42, 0.7)', border: '1px solid #334155', borderRadius: 8, padding: 12, marginBottom: 10 };
 const meter = { height: 8, background: '#1f2937', borderRadius: 999, overflow: 'hidden' };
 const fill = { display: 'block', height: '100%', background: 'linear-gradient(135deg, #38bdf8, #818cf8)' };

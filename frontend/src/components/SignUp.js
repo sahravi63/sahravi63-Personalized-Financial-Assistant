@@ -113,10 +113,10 @@ const SignUp = () => {
         toggleVisibility={toggleConfirmPasswordVisibility}
       />
       {error && <p style={{color: 'red'}}>{error}</p>}
-      <button onClick={COLLECTDATA} className='appButton' type='button'>
-        Register
-      </button>
       <div className="auth-buttons">
+        <button onClick={COLLECTDATA} className='appButton' type='button'>
+          Register
+        </button>
         <button onClick={redirectToLogin} className='appButton' type='button'>
           Login
         </button>

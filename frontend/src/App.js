@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Nav from './components/Nav';
@@ -21,6 +21,7 @@ import Investment from './components/Investment/Investment';
 import Users from './components/Admin/Users';
 import ResetPassword from './components/ResetPassword';
 import api from './api';
+import { UserContext } from './context/UserContext';
 
 function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmin, handleLogin, handleLogout }) {
   const location = useLocation();
@@ -101,12 +102,7 @@ function AppShell({ isLoggedIn, setIsLoggedIn, user, setUser, isAdmin, setIsAdmi
 }
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('role') === 'admin');
+  const { user, setUser, isLoggedIn, setIsLoggedIn, isAdmin, setIsAdmin } = useContext(UserContext);
 
   useEffect(() => {
     const verifySession = async () => {

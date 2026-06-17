@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const adminAuthenticate = require('../adminAuthenticate');
@@ -24,10 +25,19 @@ router.post('/login', async (req, res) => {
       algorithm: 'HS256',
     });
 
+    const refreshToken = crypto.randomBytes(64).toString('hex');
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await User.findByIdAndUpdate(user._id, {
+      refreshTokenHash,
+      refreshTokenExpiresAt,
+    });
+
     return res.json({
       success: true,
       accessToken,
-      refreshToken: accessToken,
+      refreshToken,
       admin: { id: user._id, username: user.username, email: user.email, role: user.role },
     });
   } catch (err) {
@@ -36,26 +46,58 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/refresh-token', (req, res) => {
+router.post('/refresh-token', async (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(400).json({ error: 'Refresh token is required' });
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err || decoded.role !== 'admin') {
-      return res.status(403).json({ error: 'Invalid or expired admin token' });
+  const hashedRefreshToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  try {
+    const user = await User.findOne({
+      refreshTokenHash: hashedRefreshToken,
+      role: 'admin',
+      refreshTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(403).json({ error: 'Invalid or expired admin refresh token' });
     }
 
-    const accessToken = jwt.sign({ id: decoded.id, role: decoded.role }, process.env.JWT_SECRET, {
+    const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '8h',
       algorithm: 'HS256',
     });
 
-    return res.json({ accessToken });
-  });
+    const newRefreshToken = crypto.randomBytes(64).toString('hex');
+    const newRefreshTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+    const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await User.findByIdAndUpdate(user._id, {
+      refreshTokenHash: newRefreshTokenHash,
+      refreshTokenExpiresAt,
+    });
+
+    return res.json({ accessToken, refreshToken: newRefreshToken });
+  } catch (err) {
+    console.error('Admin refresh-token error:', err);
+    return res.status(500).json({ error: 'Failed to refresh token' });
+  }
 });
 
 // All routes in this file are admin-protected
 router.use(adminAuthenticate);
+
+router.post('/logout', async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user._id, {
+      $unset: { refreshTokenHash: '', refreshTokenExpiresAt: '' },
+    });
+    res.json({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error('Admin logout error:', err);
+    res.status(500).json({ error: 'Failed to log out' });
+  }
+});
 
 // GET /admin/dashboard
 router.get('/dashboard', (req, res) => {
@@ -65,7 +107,7 @@ router.get('/dashboard', (req, res) => {
 // GET /admin/users
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, '-password -resetToken -resetTokenExpiration');
+    const users = await User.find({}, '-password -refreshTokenHash -refreshTokenExpiresAt -resetToken -resetTokenExpiration');
     res.json(users);
   } catch (err) {
     console.error('Error fetching users:', err);
@@ -76,7 +118,7 @@ router.get('/users', async (req, res) => {
 // GET /admin/users/:id
 router.get('/users/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id, '-password -resetToken -resetTokenExpiration');
+    const user = await User.findById(req.params.id, '-password -refreshTokenHash -refreshTokenExpiresAt -resetToken -resetTokenExpiration');
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (err) {
