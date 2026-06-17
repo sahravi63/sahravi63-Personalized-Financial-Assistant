@@ -122,7 +122,7 @@ function App() {
     };
 
     verifySession();
-  }, []);
+  }, [setIsAdmin, setIsLoggedIn, setUser]);
 
   const handleLogin = (userData) => {
     const loggedInUser = userData.user || userData.admin || userData;

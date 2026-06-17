@@ -3,34 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 
 const AdminDashboard = () => {
-  const navigate = useNavigate(); // Use navigate instead of history
-  const [loading, setLoading] = useState(true); // To manage loading state
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Function to refresh the token
-  const refreshToken = useCallback(async () => {
-    const refreshToken = localStorage.getItem('adminRefreshToken');
-    if (!refreshToken) return false;
-
-    try {
-      const response = await api.post('/admin/refresh-token', { token: refreshToken });
-      if (response.data.accessToken) {
-        localStorage.setItem('adminAccessToken', response.data.accessToken);
-        if (response.data.refreshToken) {
-          localStorage.setItem('adminRefreshToken', response.data.refreshToken);
-        }
-        return true;
-      } else {
-        return false;
-      }
-    } catch (err) {
-      console.error('Error refreshing token:', err);
-      return false;
-    }
-  }, []); // No dependencies for refreshToken
-
-  // Function to verify token and fetch dashboard data
-  const verifyTokenAndFetchData = useCallback(async (retried = false) => {
+  const verifyTokenAndFetchData = useCallback(async () => {
     const token = localStorage.getItem('adminAccessToken') || localStorage.getItem('token');
     if (!token) {
       navigate('/admin-login');
@@ -39,7 +16,7 @@ const AdminDashboard = () => {
 
     try {
       await api.get('/admin/dashboard');
-      setLoading(false); // Data fetched successfully
+      setLoading(false);
     } catch (err) {
       if (err.response?.status === 403 || err.response?.status === 401) {
         navigate('/admin-login');
@@ -48,7 +25,7 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     }
-  }, [navigate, refreshToken]); // Include navigate and refreshToken as dependencies
+  }, [navigate]);
 
   useEffect(() => {
     verifyTokenAndFetchData();
