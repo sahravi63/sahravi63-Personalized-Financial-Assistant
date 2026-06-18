@@ -137,6 +137,7 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('adminAccessToken');
     localStorage.removeItem('adminRefreshToken');
     localStorage.removeItem('user');

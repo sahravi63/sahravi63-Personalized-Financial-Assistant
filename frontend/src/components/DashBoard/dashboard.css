@@ -57,6 +57,11 @@
   font-size: 0.82rem;
 }
 
+.dash-search span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .dash-search input {
   min-width: 0;
   width: 100%;

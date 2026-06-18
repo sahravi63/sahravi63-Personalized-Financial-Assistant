@@ -34,8 +34,11 @@ const Login = ({ onLogin }) => {
       console.log('Login successful:', result);
       onLogin(result); // Pass user data to parent component
 
-      // Store token in localStorage for future authenticated requests
-      localStorage.setItem('token', result.token);
+      // Store auth data in localStorage for future authenticated requests
+      localStorage.setItem('token', result.token || result.accessToken);
+      if (result.refreshToken) {
+        localStorage.setItem('refreshToken', result.refreshToken);
+      }
 
       const isAdminUser = result?.user?.role === 'admin';
       navigate(isAdminUser ? '/admin/dashboard' : '/dashboard', { replace: true });

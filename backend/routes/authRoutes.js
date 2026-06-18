@@ -17,6 +17,26 @@ const validate = (req, res, next) => {
   next();
 };
 
+const signAccessToken = (user) => jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: '15m', algorithm: 'HS256' }
+);
+
+const createRefreshTokenPair = async (user) => {
+  const accessToken = signAccessToken(user);
+  const refreshToken = crypto.randomBytes(64).toString('hex');
+  const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  await User.findByIdAndUpdate(user._id, {
+    refreshTokenHash,
+    refreshTokenExpiresAt,
+  });
+
+  return { accessToken, refreshToken, refreshTokenExpiresAt };
+};
+
 const emailUser = process.env.EMAIL_USER?.trim();
 const emailPass = process.env.EMAIL_PASS?.trim();
 const emailMode = process.env.EMAIL_MODE?.trim().toLowerCase() || 'smtp';
@@ -68,15 +88,12 @@ router.post('/login', authLimiter,
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) return res.status(400).json({ error: 'Invalid credentials' });
 
-      // Include role in JWT so admin middleware can verify it
-      const token = jwt.sign(
-        { id: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '8h', algorithm: 'HS256' }
-      );
+      const { accessToken, refreshToken } = await createRefreshTokenPair(user);
 
       res.status(200).json({
-        token,
+        token: accessToken,
+        accessToken,
+        refreshToken,
         user: { id: user._id, username: user.username, email: user.email, role: user.role },
       });
     } catch (error) {
@@ -85,6 +102,62 @@ router.post('/login', authLimiter,
     }
   }
 );
+
+// POST /api/refresh
+router.post('/refresh', async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({ error: 'Refresh token is required' });
+  }
+
+  const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+  try {
+    const user = await User.findOne({
+      refreshTokenHash: hashedRefreshToken,
+      refreshTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(403).json({ error: 'Invalid or expired refresh token' });
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } = await createRefreshTokenPair(user);
+
+    res.status(200).json({
+      token: accessToken,
+      accessToken,
+      refreshToken: newRefreshToken,
+      user: { id: user._id, username: user.username, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    res.status(500).json({ error: 'Failed to refresh session' });
+  }
+});
+
+// POST /api/logout
+router.post('/logout', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+      return res.status(400).json({ error: 'Authorization token is required' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    await User.findByIdAndUpdate(decoded.id, {
+      $unset: { refreshTokenHash: '', refreshTokenExpiresAt: '' },
+    });
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Failed to log out' });
+  }
+});
 
 // POST /api/reset-password-request
 router.post('/reset-password-request', authLimiter,
