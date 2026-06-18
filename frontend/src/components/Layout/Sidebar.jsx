@@ -6,7 +6,6 @@ const NAV_ITEMS = [
   { label: 'Dashboard', to: '/dashboard', icon: 'DB' },
   { label: 'Manage', to: '/mainpage', icon: 'MG' },
   { label: 'Profile', to: '/profile', icon: 'PF' },
-  { label: 'Cards', to: '/dashboard', icon: 'CD' },
   { label: 'Activity', to: '/activity', icon: 'AC' },
   { label: 'Budgets', to: '/budgets', icon: 'BD' },
   { label: 'Goals', to: '/goals', icon: 'GL' },

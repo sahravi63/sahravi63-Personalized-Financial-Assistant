@@ -556,4 +556,4 @@ ISC — see `package.json`.
 
 ---
 
-*Built by Narayan (Ravi Sah) — SRM Institute of Science and Technology, CSE Batch 2023–2027*
+*Built by  Ravi Sah — SRM Institute of Science and Technology, CSE Batch 2023–2027*
